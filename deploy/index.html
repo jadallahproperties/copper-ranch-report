@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copper Ranch Market Report — 1830 Copper Ranch Lane, Unit C</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg-primary: #0a1929;
+    --bg-secondary: #0f2236;
+    --bg-tertiary: #142d44;
+    --gold: #c9a961;
+    --gold-light: #e0c97f;
+    --gold-soft: rgba(201, 169, 97, 0.15);
+    --gold-border: rgba(201, 169, 97, 0.35);
+    --text-primary: #f5f1e8;
+    --text-secondary: #b8b5ad;
+    --text-muted: #8a877f;
+    --divider: rgba(245, 241, 232, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.7;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+  }
+
+  .container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ========== HERO ========== */
+  .hero {
+    min-height: 100vh;
+    background:
+      linear-gradient(180deg, rgba(10, 25, 41, 0.85) 0%, rgba(10, 25, 41, 0.95) 100%),
+      radial-gradient(ellipse at top, rgba(201, 169, 97, 0.08) 0%, transparent 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 32px 60px;
+    position: relative;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .brokerage-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.35em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 5.2vw, 4.2rem);
+    color: var(--text-primary);
+    max-width: 900px;
+    margin-bottom: 28px;
+    font-weight: 300;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .hero-subject {
+    line-height: 1.15;
+  }
+
+  .hero-address {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-bottom: 18px;
+  }
+
+  .hero-specs {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .hero-specs .dot {
+    color: var(--gold);
+    opacity: 0.6;
+  }
+
+  .hero-specs .ask {
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  .hero-divider {
+    width: 80px;
+    height: 1px;
+    background: var(--gold);
+    margin: 32px auto;
+    opacity: 0.6;
+  }
+
+  .hero-intro {
+    max-width: 720px;
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.85;
+    margin: 0 auto;
+  }
+
+  .hero-meta {
+    margin-top: 48px;
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* ========== STATS BAR ========== */
+  .stats-bar {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--gold-border);
+    border-bottom: 1px solid var(--gold-border);
+    padding: 56px 32px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 32px;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 16px;
+    border-right: 1px solid var(--divider);
+  }
+
+  .stat-item:last-child {
+    border-right: none;
+  }
+
+  .stat-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.6rem;
+    color: var(--gold-light);
+    font-weight: 400;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* ========== SECTIONS ========== */
+  section.content-section {
+    padding: 100px 0;
+  }
+
+  .section-eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+    font-weight: 300;
+  }
+
+  .section-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .section-subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    max-width: 680px;
+    margin: 0 auto 64px;
+    font-size: 1rem;
+  }
+
+  /* ========== NARRATIVE ========== */
+  .narrative {
+    background: var(--bg-secondary);
+  }
+
+  .narrative-content {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .narrative-content p {
+    color: var(--text-secondary);
+    font-size: 1.08rem;
+    line-height: 1.95;
+    margin-bottom: 28px;
+  }
+
+  .narrative-content p:first-of-type::first-letter {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4.5rem;
+    color: var(--gold);
+    float: left;
+    line-height: 0.85;
+    padding: 8px 14px 0 0;
+    font-weight: 500;
+  }
+
+  .narrative-content strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .narrative-content em {
+    color: var(--gold-light);
+    font-style: italic;
+  }
+
+  /* ========== SPOTLIGHT COMPS ========== */
+  .spotlight-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  .spotlight-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--divider);
+    position: relative;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+
+  .spotlight-photo {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--gold-border);
+    filter: brightness(0.92) saturate(0.95);
+    transition: filter 0.3s ease;
+  }
+
+  .spotlight-card:hover .spotlight-photo {
+    filter: brightness(1) saturate(1);
+  }
+
+  .spotlight-card-body {
+    padding: 32px 32px 36px;
+  }
+
+  .spotlight-card:hover {
+    border-color: var(--gold-border);
+    transform: translateY(-4px);
+  }
+
+  .spotlight-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .spotlight-address {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem;
+    color: var(--text-primary);
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--divider);
+  }
+
+  .spotlight-address .unit {
+    display: inline-block;
+    margin-left: 6px;
+    font-style: italic;
+    color: var(--gold-light);
+    font-size: 1.1rem;
+  }
+
+  .spotlight-sold-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .spotlight-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.6rem;
+    color: var(--gold-light);
+    font-weight: 400;
+    margin-bottom: 4px;
+    line-height: 1;
+  }
+
+  .spotlight-orig {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .spotlight-orig s {
+    color: var(--text-muted);
+  }
+
+  .spotlight-ratio {
+    display: inline-block;
+    background: var(--gold-soft);
+    color: var(--gold-light);
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 22px;
+    letter-spacing: 0.05em;
+  }
+
+  .spotlight-divider {
+    height: 1px;
+    background: var(--divider);
+    margin: 22px 0;
+  }
+
+  .spotlight-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 20px;
+    margin-bottom: 22px;
+  }
+
+  .spotlight-meta-item {
+    font-size: 0.85rem;
+  }
+
+  .spotlight-meta-item .label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .spotlight-meta-item .value {
+    color: var(--text-primary);
+    font-weight: 400;
+  }
+
+  .spotlight-note {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    line-height: 1.6;
+    border-left: 2px solid var(--gold);
+    padding-left: 16px;
+  }
+
+  /* ========== CHARTS ========== */
+  .charts-section {
+    background: var(--bg-secondary);
+  }
+
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+  }
+
+  .chart-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--divider);
+    padding: 32px;
+    position: relative;
+  }
+
+  .chart-card.featured {
+    border-color: var(--gold-border);
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, rgba(201, 169, 97, 0.04) 100%);
+  }
+
+  .chart-card-header {
+    margin-bottom: 24px;
+  }
+
+  .chart-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .chart-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    font-weight: 400;
+  }
+
+  .chart-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .chart-container {
+    position: relative;
+    height: 280px;
+  }
+
+  /* ========== MAP ========== */
+  .map-section {
+    padding: 100px 0;
+  }
+
+  #map {
+    height: 480px;
+    width: 100%;
+    border: 1px solid var(--gold-border);
+    background: var(--bg-tertiary);
+  }
+
+  .map-legend {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+  }
+
+  .legend-star {
+    color: var(--gold);
+    font-size: 1.2rem;
+  }
+
+  /* ========== TABLE ========== */
+  .table-section {
+    background: var(--bg-secondary);
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--divider);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+    background: var(--bg-tertiary);
+  }
+
+  thead {
+    background: var(--bg-primary);
+  }
+
+  th {
+    padding: 18px 16px;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid var(--gold-border);
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+
+  th:hover {
+    background: var(--bg-secondary);
+  }
+
+  th .sort-indicator {
+    margin-left: 6px;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+  }
+
+  th.sort-asc .sort-indicator,
+  th.sort-desc .sort-indicator {
+    color: var(--gold-light);
+  }
+
+  td {
+    padding: 16px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--divider);
+  }
+
+  th.photo-col { width: 84px; padding: 18px 8px; }
+
+  td.photo-cell {
+    padding: 8px;
+    width: 84px;
+  }
+
+  td.photo-cell img {
+    width: 68px;
+    height: 48px;
+    object-fit: cover;
+    display: block;
+    border: 1px solid var(--divider);
+    background: var(--bg-secondary);
+  }
+
+  tbody tr:hover {
+    background: rgba(201, 169, 97, 0.04);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  td.highlight {
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  /* ========== OFFER SECTION ========== */
+  .offer-section {
+    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    border-top: 1px solid var(--gold-border);
+    border-bottom: 1px solid var(--gold-border);
+  }
+
+  .offer-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    margin-top: 24px;
+  }
+
+  .offer-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--divider);
+    padding: 40px 32px;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .offer-card:hover {
+    border-color: var(--gold-border);
+    transform: translateY(-4px);
+  }
+
+  .offer-card.featured {
+    border-color: var(--gold);
+    background: linear-gradient(180deg, var(--bg-tertiary) 0%, rgba(201, 169, 97, 0.06) 100%);
+    box-shadow: 0 0 32px rgba(201, 169, 97, 0.08);
+  }
+
+  .offer-card.featured::before {
+    content: 'BALANCED POSITION';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--gold);
+    color: var(--bg-primary);
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    padding: 6px 16px;
+    font-weight: 600;
+  }
+
+  .offer-tier {
+    font-size: 0.72rem;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+
+  .offer-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.4rem;
+    color: var(--gold-light);
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+
+  .offer-delta {
+    font-size: 0.92rem;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+  }
+
+  .offer-ppsf {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+
+  .offer-divider {
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    margin: 0 auto 20px;
+    opacity: 0.6;
+  }
+
+  .offer-anchor {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .offer-ask-bar {
+    text-align: center;
+    margin-bottom: 8px;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .offer-ask-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    margin-left: 12px;
+    letter-spacing: 0;
+    font-style: italic;
+    text-transform: none;
+  }
+
+  /* ========== CLOSING ========== */
+  .closing {
+    background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    text-align: center;
+    padding: 80px 32px 60px;
+    border-top: 1px solid var(--gold-border);
+  }
+
+  .closing-icon {
+    color: var(--gold);
+    font-size: 1.5rem;
+    letter-spacing: 1em;
+    margin-bottom: 24px;
+  }
+
+  .closing h2 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    margin-bottom: 28px;
+    font-weight: 300;
+  }
+
+  .closing h2 em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .closing p {
+    color: var(--text-secondary);
+    max-width: 680px;
+    margin: 0 auto 24px;
+    font-size: 1.08rem;
+    line-height: 1.9;
+  }
+
+  .signature {
+    margin-top: 56px;
+    padding-top: 40px;
+    border-top: 1px solid var(--divider);
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .signature-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-style: italic;
+    color: var(--gold-light);
+    margin-bottom: 8px;
+  }
+
+  .signature-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* ========== FOOTER ========== */
+  footer {
+    background: var(--bg-primary);
+    padding: 40px 32px;
+    text-align: center;
+    border-top: 1px solid var(--divider);
+  }
+
+  footer p {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    line-height: 1.8;
+  }
+
+  footer p + p {
+    margin-top: 8px;
+  }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 900px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .stat-item {
+      border-right: none;
+      border-bottom: 1px solid var(--divider);
+      padding-bottom: 24px;
+    }
+    .spotlight-grid {
+      grid-template-columns: 1fr;
+    }
+    .charts-grid {
+      grid-template-columns: 1fr;
+    }
+    .offer-grid {
+      grid-template-columns: 1fr;
+    }
+    section.content-section {
+      padding: 70px 0;
+    }
+    .stats-bar { padding: 40px 24px; }
+    .container { padding: 0 24px; }
+  }
+
+  @media (max-width: 540px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .spotlight-meta { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="brokerage-mark">Jadallah Properties</div>
+  <div class="hero-eyebrow">Comparable Sales Report</div>
+  <h1 class="hero-subject"><em>1830 Copper Ranch Lane,</em> Unit C</h1>
+  <p class="hero-address">Hailey, ID 83333</p>
+  <div class="hero-specs">
+    <span>1,062 sq ft</span>
+    <span class="dot">·</span>
+    <span>2 BD / 2 BA</span>
+    <span class="dot">·</span>
+    <span class="ask">Listed at $480,000</span>
+    <span class="dot">·</span>
+    <span>$452 / sq ft</span>
+  </div>
+  <div class="hero-divider"></div>
+  <div class="hero-meta">Prepared April 2026 &nbsp;·&nbsp; 6 Closed Comparable Sales</div>
+</section>
+
+<!-- ============ STATS BAR ============ -->
+<div class="stats-bar">
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-value">$432,500</div>
+      <div class="stat-label">Median Sold</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">$394</div>
+      <div class="stat-label">Avg Price / SF</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">118</div>
+      <div class="stat-label">Avg Days on Market</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">95.95%</div>
+      <div class="stat-label">Sale to Original List</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">6</div>
+      <div class="stat-label">Comps Analyzed</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============ SPOTLIGHT COMPS ============ -->
+<section class="content-section">
+  <div class="container">
+    <div class="section-eyebrow">Anchor Comps</div>
+
+    <div class="spotlight-grid">
+      <!-- Card 1: 25-333464 -->
+      <div class="spotlight-card">
+        <img class="spotlight-photo" src="https://cdn.photos.sparkplatform.com/saw/20250716152153714980000000.jpg" alt="1930 Copper Ranch Lane, Unit C" loading="lazy" referrerpolicy="no-referrer">
+        <div class="spotlight-card-body">
+          <div class="spotlight-address">1930 Copper Ranch Lane <span class="unit">Unit C</span></div>
+          <div class="spotlight-sold-label">Sold Price</div>
+          <div class="spotlight-price">$465,000</div>
+          <div class="spotlight-orig">Original list <s>$485,000</s> &nbsp;·&nbsp; List $465,000</div>
+          <div class="spotlight-ratio">95.88% of original list</div>
+          <div class="spotlight-divider"></div>
+          <div class="spotlight-meta">
+            <div class="spotlight-meta-item">
+              <span class="label">Size</span>
+              <span class="value">1,183 sq ft</span>
+            </div>
+            <div class="spotlight-meta-item">
+              <span class="label">Layout</span>
+              <span class="value">2 BD / 2 BA</span>
+            </div>
+            <div class="spotlight-meta-item">
+              <span class="label">Days on Market</span>
+              <span class="value">90 days</span>
+            </div>
+            <div class="spotlight-meta-item">
+              <span class="label">Sold Date</span>
+              <span class="value">Oct 14, 2025</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: 25-333481 -->
+      <div class="spotlight-card">
+        <img class="spotlight-photo" src="https://cdn.photos.sparkplatform.com/saw/20241205015342942243000000.jpg" alt="920 White Cloud Lane, Unit E" loading="lazy" referrerpolicy="no-referrer">
+        <div class="spotlight-card-body">
+          <div class="spotlight-address">920 White Cloud Lane <span class="unit">Unit E</span></div>
+          <div class="spotlight-sold-label">Sold Price</div>
+          <div class="spotlight-price">$392,048</div>
+          <div class="spotlight-orig">Original list <s>$429,000</s> &nbsp;·&nbsp; List $409,000</div>
+          <div class="spotlight-ratio">91.39% of original list</div>
+          <div class="spotlight-divider"></div>
+          <div class="spotlight-meta">
+            <div class="spotlight-meta-item">
+              <span class="label">Size</span>
+              <span class="value">966 sq ft</span>
+            </div>
+            <div class="spotlight-meta-item">
+              <span class="label">Layout</span>
+              <span class="value">2 BD / 1 BA</span>
+            </div>
+            <div class="spotlight-meta-item">
+              <span class="label">Days on Market</span>
+              <span class="value">77 days</span>
+            </div>
+            <div class="spotlight-meta-item">
+              <span class="label">Sold Date</span>
+              <span class="value">Oct 3, 2025</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: 25-333346 -->
+      <div class="spotlight-card">
+        <img class="spotlight-photo" src="https://cdn.photos.sparkplatform.com/saw/20250627181447512339000000.jpg" alt="1940 Copper Ranch Lane, Unit E" loading="lazy" referrerpolicy="no-referrer">
+        <div class="spotlight-card-body">
+          <div class="spotlight-address">1940 Copper Ranch Lane <span class="unit">Unit E</span></div>
+          <div class="spotlight-sold-label">Sold Price</div>
+          <div class="spotlight-price">$380,000</div>
+          <div class="spotlight-orig">Original list <s>$400,000</s> &nbsp;·&nbsp; List $390,000</div>
+          <div class="spotlight-ratio">95.00% of original list</div>
+          <div class="spotlight-divider"></div>
+          <div class="spotlight-meta">
+            <div class="spotlight-meta-item">
+              <span class="label">Size</span>
+              <span class="value">983 sq ft</span>
+            </div>
+            <div class="spotlight-meta-item">
+              <span class="label">Layout</span>
+              <span class="value">2 BD / 1 BA</span>
+            </div>
+            <div class="spotlight-meta-item">
+              <span class="label">Days on Market</span>
+              <span class="value">203 days</span>
+            </div>
+            <div class="spotlight-meta-item">
+              <span class="label">Sold Date</span>
+              <span class="value">Jan 16, 2026</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHARTS ============ -->
+<section class="content-section charts-section">
+  <div class="container">
+    <div class="section-eyebrow">Data Views</div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-eyebrow">Distribution</div>
+          <div class="chart-title">Sold Price Across Comps</div>
+          <div class="chart-subtitle">Closed sales ranged from $380K to $465K</div>
+        </div>
+        <div class="chart-container"><canvas id="chartSoldPrice"></canvas></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-eyebrow">Per Square Foot</div>
+          <div class="chart-title">Price / SF by Comp</div>
+          <div class="chart-subtitle">Average $394 / SF across the set</div>
+        </div>
+        <div class="chart-container"><canvas id="chartPPSF"></canvas></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-eyebrow">Time to Contract</div>
+          <div class="chart-title">Days on Market</div>
+          <div class="chart-subtitle">Average 118 days — Copper Ranch is not a velocity market</div>
+        </div>
+        <div class="chart-container"><canvas id="chartDOM"></canvas></div>
+      </div>
+
+      <div class="chart-card featured">
+        <div class="chart-card-header">
+          <div class="chart-eyebrow">Negotiating Leverage</div>
+          <div class="chart-title">Sold vs. Original List Price</div>
+          <div class="chart-subtitle">Every seller in the set closed below their initial ask</div>
+        </div>
+        <div class="chart-container"><canvas id="chartRatio"></canvas></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MAP ============ -->
+<section class="content-section map-section">
+  <div class="container">
+    <div class="section-eyebrow">Location</div>
+    <div id="map"></div>
+    <div class="map-legend">
+      <div class="legend-item"><span class="legend-star">★</span> Subject Property — 1830 Copper Ranch Lane, Unit C</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#c9a961"></span> Closed Comparable Sales</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FULL TABLE ============ -->
+<section class="content-section table-section">
+  <div class="container">
+    <div class="section-eyebrow">All Closed Comparable Sales &nbsp;·&nbsp; Click Any Column to Sort</div>
+
+    <div class="table-wrap">
+      <table id="compTable">
+        <thead>
+          <tr>
+            <th class="photo-col"></th>
+            <th data-key="address" data-type="string">Address <span class="sort-indicator">↕</span></th>
+            <th data-key="unit" data-type="string">Unit <span class="sort-indicator">↕</span></th>
+            <th data-key="sqft" data-type="number">SqFt <span class="sort-indicator">↕</span></th>
+            <th data-key="beds" data-type="number">Beds <span class="sort-indicator">↕</span></th>
+            <th data-key="baths" data-type="number">Baths <span class="sort-indicator">↕</span></th>
+            <th data-key="orig" data-type="number">Orig List <span class="sort-indicator">↕</span></th>
+            <th data-key="list" data-type="number">List Price <span class="sort-indicator">↕</span></th>
+            <th data-key="sold" data-type="number">Sold Price <span class="sort-indicator">↕</span></th>
+            <th data-key="ratio" data-type="number">Sale / Orig <span class="sort-indicator">↕</span></th>
+            <th data-key="dom" data-type="number">DOM <span class="sort-indicator">↕</span></th>
+            <th data-key="date" data-type="date">Sold Date <span class="sort-indicator">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="compTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RECOMMENDED OFFER ============ -->
+<section class="content-section offer-section">
+  <div class="container">
+    <div class="section-eyebrow">Recommended Offer Range</div>
+    <div class="offer-ask-bar">List Price <span class="offer-ask-value">$480,000</span></div>
+
+    <div class="offer-grid">
+      <div class="offer-card">
+        <div class="offer-tier">Aggressive</div>
+        <div class="offer-price">$435,000</div>
+        <div class="offer-delta">$45,000 under ask &nbsp;·&nbsp; 9.4% off</div>
+        <div class="offer-ppsf">$410 / sq ft &nbsp;·&nbsp; $14 below top comp</div>
+        <div class="offer-divider"></div>
+        <div class="offer-anchor">Anchored to the median closed sale of $432,500. Treats the remodel as a modest factor over the comp set's center of gravity.</div>
+      </div>
+
+      <div class="offer-card featured">
+        <div class="offer-tier">Balanced</div>
+        <div class="offer-price">$455,000</div>
+        <div class="offer-delta">$25,000 under ask &nbsp;·&nbsp; 5.2% off</div>
+        <div class="offer-ppsf">$428 / sq ft &nbsp;·&nbsp; $5 above top comp</div>
+        <div class="offer-divider"></div>
+        <div class="offer-anchor">Matches the top closed unrenovated comp net of seller concessions (~$456K). Pays for the remodel via parity with the unrenovated ceiling.</div>
+      </div>
+
+      <div class="offer-card">
+        <div class="offer-tier">Conservative</div>
+        <div class="offer-price">$470,000</div>
+        <div class="offer-delta">$10,000 under ask &nbsp;·&nbsp; 2.1% off</div>
+        <div class="offer-ppsf">$443 / sq ft &nbsp;·&nbsp; $19 above top comp</div>
+        <div class="offer-divider"></div>
+        <div class="offer-anchor">Acknowledges a meaningful remodel premium of ~$5K over the top comp. Lowest-risk offer; preserves negotiating room without conceding ask.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLOSING ============ -->
+<section class="closing">
+  <div class="closing-icon">◆ ◆ ◆</div>
+  <div class="signature">
+    <div class="signature-name">Jordan Jadallah</div>
+    <div class="signature-title">Jadallah Properties</div>
+  </div>
+</section>
+
+<footer>
+  <p>Jadallah Properties &nbsp;·&nbsp; Sun Valley · Hailey · Wood River Valley</p>
+  <p>Market data sourced from FlexMLS closed sales, Copper Ranch subdivision. Report prepared for client use only.</p>
+  <p>© 2026 Jadallah Properties. Information deemed reliable but not guaranteed.</p>
+</footer>
+
+<script>
+  // ============ DATA ============
+  const COMPS = [
+    { mls: '25-332755', address: '930 White Cloud Lane',   unit: 'Unit C', lat: 43.507507, lng: -114.290892, sqft: 1177, beds: 2, baths: 2, orig: 445000, list: 445000, sold: 440000, dom: 96,  date: '2025-05-12', year: 2004, photo: 'https://cdn.photos.sparkplatform.com/saw/20250202221729868623000000.jpg' },
+    { mls: '25-333345', address: '1930 Copper Ranch Lane', unit: 'Unit B', lat: 43.506861, lng: -114.289636, sqft: 1173, beds: 3, baths: 2, orig: 465000, list: 445000, sold: 445000, dom: 175, date: '2025-12-19', year: 2006, photo: 'https://cdn.photos.sparkplatform.com/saw/20250628004209435342000000.jpg' },
+    { mls: '25-333346', address: '1940 Copper Ranch Lane', unit: 'Unit E', lat: 43.506244, lng: -114.290065, sqft: 983,  beds: 2, baths: 1, orig: 400000, list: 390000, sold: 380000, dom: 203, date: '2026-01-16', year: 2005, photo: 'https://cdn.photos.sparkplatform.com/saw/20250627181447512339000000.jpg' },
+    { mls: '25-333464', address: '1930 Copper Ranch Lane', unit: 'Unit C', lat: 43.506859, lng: -114.289600, sqft: 1183, beds: 2, baths: 2, orig: 485000, list: 465000, sold: 465000, dom: 90,  date: '2025-10-14', year: 2006, photo: 'https://cdn.photos.sparkplatform.com/saw/20250716152153714980000000.jpg' },
+    { mls: '25-333481', address: '920 White Cloud Lane',   unit: 'Unit E', lat: 43.507238, lng: -114.291137, sqft: 966,  beds: 2, baths: 1, orig: 429000, list: 409000, sold: 392048, dom: 77,  date: '2025-10-03', year: 2004, photo: 'https://cdn.photos.sparkplatform.com/saw/20241205015342942243000000.jpg' },
+    { mls: '24-332683', address: '1830 Copper Ranch Lane', unit: 'Unit A', lat: 43.507873, lng: -114.290486, sqft: 1004, beds: 2, baths: 2, orig: 429900, list: 429900, sold: 425000, dom: 65,  date: '2025-03-07', year: 2005, photo: 'https://cdn.photos.sparkplatform.com/saw/20250101235926711426000000.jpg' },
+  ];
+
+  const SUBJECT = { lat: 43.507873, lng: -114.290486 }; // 1830 Copper Ranch Lane (subject building)
+
+  const fmtCurrency = (n) => '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  const fmtPct = (n) => (n * 100).toFixed(2) + '%';
+
+  // ============ TABLE ============
+  function renderTable(data) {
+    const tbody = document.getElementById('compTbody');
+    tbody.innerHTML = '';
+    data.forEach(c => {
+      const ratio = c.sold / c.orig;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="photo-cell"><img src="${c.photo}" alt="" loading="lazy" referrerpolicy="no-referrer"></td>
+        <td>${c.address}</td>
+        <td>${c.unit}</td>
+        <td>${c.sqft.toLocaleString()}</td>
+        <td>${c.beds}</td>
+        <td>${c.baths}</td>
+        <td>${fmtCurrency(c.orig)}</td>
+        <td>${fmtCurrency(c.list)}</td>
+        <td class="highlight">${fmtCurrency(c.sold)}</td>
+        <td>${fmtPct(ratio)}</td>
+        <td>${c.dom}</td>
+        <td>${c.date}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  let sortState = { key: null, dir: 1 };
+
+  function sortTable(key, type) {
+    if (sortState.key === key) sortState.dir = -sortState.dir;
+    else { sortState.key = key; sortState.dir = 1; }
+
+    const sorted = [...COMPS];
+    sorted.sort((a, b) => {
+      let av, bv;
+      if (key === 'ratio') { av = a.sold / a.orig; bv = b.sold / b.orig; }
+      else if (key === 'date') { av = new Date(a.date).getTime(); bv = new Date(b.date).getTime(); }
+      else { av = a[key]; bv = b[key]; }
+
+      if (type === 'string') return sortState.dir * String(av).localeCompare(String(bv));
+      return sortState.dir * (av - bv);
+    });
+
+    document.querySelectorAll('#compTable th').forEach(th => {
+      th.classList.remove('sort-asc', 'sort-desc');
+      const ind = th.querySelector('.sort-indicator');
+      if (ind) ind.textContent = '↕';
+    });
+    const activeTh = document.querySelector(`#compTable th[data-key="${key}"]`);
+    if (activeTh) {
+      activeTh.classList.add(sortState.dir === 1 ? 'sort-asc' : 'sort-desc');
+      activeTh.querySelector('.sort-indicator').textContent = sortState.dir === 1 ? '↑' : '↓';
+    }
+    renderTable(sorted);
+  }
+
+  document.querySelectorAll('#compTable th').forEach(th => {
+    th.addEventListener('click', () => sortTable(th.dataset.key, th.dataset.type));
+  });
+
+  renderTable(COMPS);
+
+  // ============ CHARTS & MAP (deferred to load) ============
+  window.addEventListener('load', function() {
+    // Chart.js global theming
+    try {
+      if (typeof Chart !== 'undefined') {
+        Chart.defaults.color = '#b8b5ad';
+        Chart.defaults.font.family = "'DM Sans', sans-serif";
+        Chart.defaults.font.size = 11;
+        Chart.defaults.borderColor = 'rgba(245, 241, 232, 0.08)';
+      }
+    } catch (e) { console.warn('Chart defaults failed', e); }
+
+    const labels = COMPS.map(c => [c.address.replace(' Lane', ''), c.unit]);
+    const goldGradient = (ctx) => {
+      const chart = ctx.chart;
+      const { ctx: c, chartArea } = chart;
+      if (!chartArea) return 'rgba(201, 169, 97, 0.6)';
+      const g = c.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+      g.addColorStop(0, 'rgba(201, 169, 97, 0.25)');
+      g.addColorStop(1, 'rgba(201, 169, 97, 0.85)');
+      return g;
+    };
+
+    const baseOpts = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0a1929',
+          titleColor: '#e0c97f',
+          bodyColor: '#f5f1e8',
+          borderColor: 'rgba(201, 169, 97, 0.35)',
+          borderWidth: 1,
+          padding: 12,
+          titleFont: { family: "'Cormorant Garamond', serif", size: 14, weight: '500' },
+          bodyFont: { family: "'DM Sans', sans-serif", size: 12 },
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#8a877f' } },
+        y: { grid: { color: 'rgba(245, 241, 232, 0.06)' }, ticks: { color: '#8a877f' } }
+      }
+    };
+
+    // Chart 1: Sold Price
+    try {
+      new Chart(document.getElementById('chartSoldPrice'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Sold Price',
+            data: COMPS.map(c => c.sold),
+            backgroundColor: goldGradient,
+            borderColor: '#c9a961',
+            borderWidth: 1,
+            borderRadius: 2,
+          }]
+        },
+        options: {
+          ...baseOpts,
+          plugins: {
+            ...baseOpts.plugins,
+            tooltip: {
+              ...baseOpts.plugins.tooltip,
+              callbacks: { label: (ctx) => 'Sold: ' + fmtCurrency(ctx.parsed.y) }
+            }
+          },
+          scales: {
+            ...baseOpts.scales,
+            y: {
+              ...baseOpts.scales.y,
+              ticks: { ...baseOpts.scales.y.ticks, callback: (v) => '$' + (v / 1000) + 'K' }
+            }
+          }
+        }
+      });
+    } catch (e) { console.warn('Chart 1 failed', e); }
+
+    // Chart 2: Price per SF
+    try {
+      new Chart(document.getElementById('chartPPSF'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: '$ / SF',
+            data: COMPS.map(c => Math.round(c.sold / c.sqft)),
+            backgroundColor: goldGradient,
+            borderColor: '#c9a961',
+            borderWidth: 1,
+            borderRadius: 2,
+          }]
+        },
+        options: {
+          ...baseOpts,
+          plugins: {
+            ...baseOpts.plugins,
+            tooltip: {
+              ...baseOpts.plugins.tooltip,
+              callbacks: { label: (ctx) => '$' + ctx.parsed.y + ' / SF' }
+            }
+          },
+          scales: {
+            ...baseOpts.scales,
+            y: {
+              ...baseOpts.scales.y,
+              ticks: { ...baseOpts.scales.y.ticks, callback: (v) => '$' + v }
+            }
+          }
+        }
+      });
+    } catch (e) { console.warn('Chart 2 failed', e); }
+
+    // Chart 3: DOM
+    try {
+      new Chart(document.getElementById('chartDOM'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Days on Market',
+            data: COMPS.map(c => c.dom),
+            backgroundColor: goldGradient,
+            borderColor: '#c9a961',
+            borderWidth: 1,
+            borderRadius: 2,
+          }]
+        },
+        options: {
+          ...baseOpts,
+          plugins: {
+            ...baseOpts.plugins,
+            tooltip: {
+              ...baseOpts.plugins.tooltip,
+              callbacks: { label: (ctx) => ctx.parsed.y + ' days' }
+            }
+          },
+          scales: {
+            ...baseOpts.scales,
+            y: {
+              ...baseOpts.scales.y,
+              ticks: { ...baseOpts.scales.y.ticks, callback: (v) => v + ' d' }
+            }
+          }
+        }
+      });
+    } catch (e) { console.warn('Chart 3 failed', e); }
+
+    // Chart 4: Sale-to-list ratio (FEATURED)
+    try {
+      const ratios = COMPS.map(c => +(c.sold / c.orig * 100).toFixed(2));
+      new Chart(document.getElementById('chartRatio'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Sale to Original List %',
+            data: ratios,
+            backgroundColor: ratios.map(r =>
+              r < 95 ? 'rgba(224, 201, 127, 0.95)' : 'rgba(201, 169, 97, 0.7)'
+            ),
+            borderColor: '#c9a961',
+            borderWidth: 1.5,
+            borderRadius: 2,
+          }]
+        },
+        options: {
+          ...baseOpts,
+          plugins: {
+            ...baseOpts.plugins,
+            tooltip: {
+              ...baseOpts.plugins.tooltip,
+              callbacks: {
+                label: (ctx) => 'Sold at ' + ctx.parsed.y + '% of original list',
+                afterLabel: (ctx) => {
+                  const c = COMPS[ctx.dataIndex];
+                  return [
+                    'Original: ' + fmtCurrency(c.orig),
+                    'Sold:     ' + fmtCurrency(c.sold),
+                    'Diff:     ' + fmtCurrency(c.sold - c.orig)
+                  ];
+                }
+              }
+            },
+            // Reference line at 100% via annotation-like approach using a second dataset isn't strict — use min/max
+          },
+          scales: {
+            ...baseOpts.scales,
+            y: {
+              ...baseOpts.scales.y,
+              min: 88,
+              max: 102,
+              ticks: {
+                ...baseOpts.scales.y.ticks,
+                callback: (v) => v + '%',
+                stepSize: 2
+              },
+              grid: {
+                color: (ctx) => ctx.tick.value === 100 ? 'rgba(224, 201, 127, 0.5)' : 'rgba(245, 241, 232, 0.06)',
+                lineWidth: (ctx) => ctx.tick.value === 100 ? 1.5 : 1,
+              }
+            }
+          }
+        }
+      });
+    } catch (e) { console.warn('Chart 4 failed', e); }
+
+    // ============ MAP ============
+    try {
+      if (typeof L !== 'undefined') {
+        const center = [SUBJECT.lat, SUBJECT.lng];
+        const map = L.map('map', {
+          center,
+          zoom: 18,
+          scrollWheelZoom: false,
+          zoomControl: true
+        });
+
+        // CartoDB dark tiles for the luxury feel
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; OpenStreetMap &copy; CARTO',
+          subdomains: 'abcd',
+          maxZoom: 19
+        }).addTo(map);
+
+        // Subject — gold star
+        const starIcon = L.divIcon({
+          html: '<div style="font-size:34px;color:#e0c97f;text-shadow:0 0 10px rgba(224,201,127,0.9),0 0 2px #000;line-height:1;">★</div>',
+          className: 'subject-marker',
+          iconSize: [34, 34],
+          iconAnchor: [17, 17]
+        });
+        L.marker(center, { icon: starIcon })
+          .addTo(map)
+          .bindPopup('<div style="font-family:Cormorant Garamond,serif;font-size:1.15rem;color:#0a1929;line-height:1.4;"><strong>Subject Property</strong><br>1830 Copper Ranch Lane, Unit C<br><span style="color:#c9a961;">Listed at $480,000</span></div>')
+          .openPopup();
+
+        const goldDot = () => L.divIcon({
+          html: `<div style="
+            width:18px;height:18px;
+            background:#c9a961;
+            border:2px solid #0a1929;
+            border-radius:50%;
+            box-shadow:0 0 8px rgba(201,169,97,0.7);
+          "></div>`,
+          className: 'comp-marker',
+          iconSize: [18, 18],
+          iconAnchor: [9, 9]
+        });
+
+        const bounds = [center];
+        COMPS.forEach((c) => {
+          bounds.push([c.lat, c.lng]);
+          L.marker([c.lat, c.lng], { icon: goldDot() })
+            .addTo(map)
+            .bindPopup(`
+              <div style="font-family:DM Sans,sans-serif;font-size:0.9rem;color:#0a1929;line-height:1.5;width:220px;">
+                <img src="${c.photo}" referrerpolicy="no-referrer" style="width:100%;height:130px;object-fit:cover;display:block;margin-bottom:10px;border:1px solid #c9a961;">
+                <div style="font-family:Cormorant Garamond,serif;font-size:1.1rem;color:#0a1929;font-weight:600;margin-bottom:2px;">
+                  ${c.address}
+                </div>
+                <div style="font-style:italic;color:#c9a961;font-size:0.95rem;margin-bottom:6px;">${c.unit}</div>
+                <div style="font-family:Cormorant Garamond,serif;font-size:1.25rem;color:#0a1929;margin-bottom:6px;">
+                  Sold ${fmtCurrency(c.sold)}
+                </div>
+                ${c.sqft} sq ft · ${c.beds} BD / ${c.baths} BA<br>
+                ${c.dom} days on market<br>
+                Sold ${c.date}
+              </div>
+            `);
+        });
+
+        // Fit map to show subject + all comps with padding
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 18 });
+      }
+    } catch (e) { console.warn('Map failed', e); }
+  });
+</script>
+
+</body>
+</html>
