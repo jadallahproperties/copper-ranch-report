@@ -53,23 +53,21 @@
 
   /* ========== HERO ========== */
   .hero {
-    min-height: 100vh;
     background:
       linear-gradient(180deg, rgba(10, 25, 41, 0.85) 0%, rgba(10, 25, 41, 0.95) 100%),
       radial-gradient(ellipse at top, rgba(201, 169, 97, 0.08) 0%, transparent 60%);
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 80px 32px 60px;
+    padding: 70px 32px 80px;
     position: relative;
   }
 
   .hero::before {
     content: '';
     position: absolute;
-    top: 40px;
+    top: 28px;
     left: 50%;
     transform: translateX(-50%);
     width: 60px;
@@ -364,6 +362,14 @@
     line-height: 1;
   }
 
+  .spotlight-ppsf {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+
   .spotlight-orig {
     font-size: 0.85rem;
     color: var(--text-muted);
@@ -429,6 +435,36 @@
   /* ========== CHARTS ========== */
   .charts-section {
     background: var(--bg-secondary);
+  }
+
+  .chart-legend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+    margin: 18px 0 36px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    flex-wrap: wrap;
+  }
+
+  .chart-legend .legend-pill {
+    display: inline-block;
+    width: 18px;
+    height: 12px;
+    margin-right: 8px;
+    vertical-align: middle;
+    border: 1px solid #c9a961;
+  }
+
+  .chart-legend .legend-pill.comp {
+    background: linear-gradient(180deg, rgba(201, 169, 97, 0.85), rgba(201, 169, 97, 0.25));
+  }
+
+  .chart-legend .legend-pill.subject {
+    background: rgba(245, 241, 232, 0.92);
+    border-color: #e0c97f;
+    border-width: 2px;
   }
 
   .charts-grid {
@@ -891,6 +927,7 @@
           <div class="spotlight-address">1930 Copper Ranch Lane <span class="unit">Unit C</span></div>
           <div class="spotlight-sold-label">Sold Price</div>
           <div class="spotlight-price">$465,000</div>
+          <div class="spotlight-ppsf">$393 / sq ft</div>
           <div class="spotlight-orig">Original list <s>$485,000</s> &nbsp;·&nbsp; List $465,000</div>
           <div class="spotlight-ratio">95.88% of original list</div>
           <div class="spotlight-divider"></div>
@@ -922,6 +959,7 @@
           <div class="spotlight-address">920 White Cloud Lane <span class="unit">Unit E</span></div>
           <div class="spotlight-sold-label">Sold Price</div>
           <div class="spotlight-price">$392,048</div>
+          <div class="spotlight-ppsf">$406 / sq ft</div>
           <div class="spotlight-orig">Original list <s>$429,000</s> &nbsp;·&nbsp; List $409,000</div>
           <div class="spotlight-ratio">91.39% of original list</div>
           <div class="spotlight-divider"></div>
@@ -953,6 +991,7 @@
           <div class="spotlight-address">1940 Copper Ranch Lane <span class="unit">Unit E</span></div>
           <div class="spotlight-sold-label">Sold Price</div>
           <div class="spotlight-price">$380,000</div>
+          <div class="spotlight-ppsf">$387 / sq ft</div>
           <div class="spotlight-orig">Original list <s>$400,000</s> &nbsp;·&nbsp; List $390,000</div>
           <div class="spotlight-ratio">95.00% of original list</div>
           <div class="spotlight-divider"></div>
@@ -984,6 +1023,10 @@
 <section class="content-section charts-section">
   <div class="container">
     <div class="section-eyebrow">Data Views</div>
+    <div class="chart-legend">
+      <span class="legend-pill comp"></span> Comps
+      <span class="legend-pill subject"></span> Subject (1830 Copper Ranch, Unit C)
+    </div>
 
     <div class="charts-grid">
       <div class="chart-card">
@@ -1207,7 +1250,15 @@
       }
     } catch (e) { console.warn('Chart defaults failed', e); }
 
-    const labels = COMPS.map(c => [c.address.replace(' Lane', ''), c.unit]);
+    // Subject + comps for charts
+    const SUBJECT_LABEL = ['1830 Copper Ranch', '★ Unit C (Subject)'];
+    const SUBJECT_LIST = 480000;
+    const SUBJECT_SQFT = 1062;
+    const SUBJECT_PPSF = Math.round(SUBJECT_LIST / SUBJECT_SQFT); // 452
+
+    const labels = [...COMPS.map(c => [c.address.replace(' Lane', ''), c.unit]), SUBJECT_LABEL];
+    const SUBJECT_IDX = COMPS.length;
+
     const goldGradient = (ctx) => {
       const chart = ctx.chart;
       const { ctx: c, chartArea } = chart;
@@ -1217,6 +1268,15 @@
       g.addColorStop(1, 'rgba(201, 169, 97, 0.85)');
       return g;
     };
+
+    // Bright gold-cream for the subject bar — visually distinct
+    const subjectFill = 'rgba(245, 241, 232, 0.92)';
+    const subjectBorder = '#e0c97f';
+
+    // Returns a function that fills comp bars with goldGradient and the subject bar with bright cream
+    const barFill = (ctx) => ctx.dataIndex === SUBJECT_IDX ? subjectFill : goldGradient(ctx);
+    const barBorder = (ctx) => ctx.dataIndex === SUBJECT_IDX ? subjectBorder : '#c9a961';
+    const barWidth  = (ctx) => ctx.dataIndex === SUBJECT_IDX ? 2.5 : 1;
 
     const baseOpts = {
       responsive: true,
@@ -1240,18 +1300,18 @@
       }
     };
 
-    // Chart 1: Sold Price
+    // Chart 1: Sold Price (with subject as List Price)
     try {
       new Chart(document.getElementById('chartSoldPrice'), {
         type: 'bar',
         data: {
           labels,
           datasets: [{
-            label: 'Sold Price',
-            data: COMPS.map(c => c.sold),
-            backgroundColor: goldGradient,
-            borderColor: '#c9a961',
-            borderWidth: 1,
+            label: 'Price',
+            data: [...COMPS.map(c => c.sold), SUBJECT_LIST],
+            backgroundColor: barFill,
+            borderColor: barBorder,
+            borderWidth: barWidth,
             borderRadius: 2,
           }]
         },
@@ -1261,7 +1321,11 @@
             ...baseOpts.plugins,
             tooltip: {
               ...baseOpts.plugins.tooltip,
-              callbacks: { label: (ctx) => 'Sold: ' + fmtCurrency(ctx.parsed.y) }
+              callbacks: {
+                label: (ctx) => ctx.dataIndex === SUBJECT_IDX
+                  ? 'Listed: ' + fmtCurrency(ctx.parsed.y)
+                  : 'Sold: ' + fmtCurrency(ctx.parsed.y)
+              }
             }
           },
           scales: {
@@ -1275,7 +1339,7 @@
       });
     } catch (e) { console.warn('Chart 1 failed', e); }
 
-    // Chart 2: Price per SF
+    // Chart 2: Price per SF (with subject)
     try {
       new Chart(document.getElementById('chartPPSF'), {
         type: 'bar',
@@ -1283,10 +1347,10 @@
           labels,
           datasets: [{
             label: '$ / SF',
-            data: COMPS.map(c => Math.round(c.sold / c.sqft)),
-            backgroundColor: goldGradient,
-            borderColor: '#c9a961',
-            borderWidth: 1,
+            data: [...COMPS.map(c => Math.round(c.sold / c.sqft)), SUBJECT_PPSF],
+            backgroundColor: barFill,
+            borderColor: barBorder,
+            borderWidth: barWidth,
             borderRadius: 2,
           }]
         },
@@ -1296,7 +1360,11 @@
             ...baseOpts.plugins,
             tooltip: {
               ...baseOpts.plugins.tooltip,
-              callbacks: { label: (ctx) => '$' + ctx.parsed.y + ' / SF' }
+              callbacks: {
+                label: (ctx) => ctx.dataIndex === SUBJECT_IDX
+                  ? 'Listed at $' + ctx.parsed.y + ' / SF'
+                  : '$' + ctx.parsed.y + ' / SF'
+              }
             }
           },
           scales: {
@@ -1310,7 +1378,7 @@
       });
     } catch (e) { console.warn('Chart 2 failed', e); }
 
-    // Chart 3: DOM
+    // Chart 3: DOM (subject just listed — show as 0 with tooltip)
     try {
       new Chart(document.getElementById('chartDOM'), {
         type: 'bar',
@@ -1318,10 +1386,10 @@
           labels,
           datasets: [{
             label: 'Days on Market',
-            data: COMPS.map(c => c.dom),
-            backgroundColor: goldGradient,
-            borderColor: '#c9a961',
-            borderWidth: 1,
+            data: [...COMPS.map(c => c.dom), 0],
+            backgroundColor: barFill,
+            borderColor: barBorder,
+            borderWidth: barWidth,
             borderRadius: 2,
           }]
         },
@@ -1331,7 +1399,11 @@
             ...baseOpts.plugins,
             tooltip: {
               ...baseOpts.plugins.tooltip,
-              callbacks: { label: (ctx) => ctx.parsed.y + ' days' }
+              callbacks: {
+                label: (ctx) => ctx.dataIndex === SUBJECT_IDX
+                  ? 'Currently active — pre-offer'
+                  : ctx.parsed.y + ' days'
+              }
             }
           },
           scales: {
@@ -1345,21 +1417,25 @@
       });
     } catch (e) { console.warn('Chart 3 failed', e); }
 
-    // Chart 4: Sale-to-list ratio (FEATURED)
+    // Chart 4: Sale-to-list ratio (subject currently at 100%)
     try {
       const ratios = COMPS.map(c => +(c.sold / c.orig * 100).toFixed(2));
+      const ratiosWithSubject = [...ratios, 100];
       new Chart(document.getElementById('chartRatio'), {
         type: 'bar',
         data: {
           labels,
           datasets: [{
             label: 'Sale to Original List %',
-            data: ratios,
-            backgroundColor: ratios.map(r =>
-              r < 95 ? 'rgba(224, 201, 127, 0.95)' : 'rgba(201, 169, 97, 0.7)'
-            ),
-            borderColor: '#c9a961',
-            borderWidth: 1.5,
+            data: ratiosWithSubject,
+            backgroundColor: (ctx) => {
+              if (ctx.dataIndex === SUBJECT_IDX) return subjectFill;
+              return ratios[ctx.dataIndex] < 95
+                ? 'rgba(224, 201, 127, 0.95)'
+                : 'rgba(201, 169, 97, 0.7)';
+            },
+            borderColor: barBorder,
+            borderWidth: barWidth,
             borderRadius: 2,
           }]
         },
@@ -1370,8 +1446,11 @@
             tooltip: {
               ...baseOpts.plugins.tooltip,
               callbacks: {
-                label: (ctx) => 'Sold at ' + ctx.parsed.y + '% of original list',
+                label: (ctx) => ctx.dataIndex === SUBJECT_IDX
+                  ? 'Currently at 100% of list (asking price)'
+                  : 'Sold at ' + ctx.parsed.y + '% of original list',
                 afterLabel: (ctx) => {
+                  if (ctx.dataIndex === SUBJECT_IDX) return ['Listed: ' + fmtCurrency(SUBJECT_LIST)];
                   const c = COMPS[ctx.dataIndex];
                   return [
                     'Original: ' + fmtCurrency(c.orig),
@@ -1381,7 +1460,6 @@
                 }
               }
             },
-            // Reference line at 100% via annotation-like approach using a second dataset isn't strict — use min/max
           },
           scales: {
             ...baseOpts.scales,
