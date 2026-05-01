@@ -370,6 +370,39 @@
     margin-bottom: 8px;
   }
 
+  .spotlight-concession {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: rgba(212, 165, 116, 0.08);
+    border-left: 2px solid #d4a574;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .spotlight-concession .conc-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .spotlight-concession .conc-amt {
+    color: #d4a574;
+    font-weight: 500;
+  }
+
+  .spotlight-concession .conc-net {
+    color: var(--text-secondary);
+  }
+
+  .spotlight-concession .conc-net strong {
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
   .spotlight-orig {
     font-size: 0.85rem;
     color: var(--text-muted);
@@ -639,6 +672,45 @@
   td.highlight {
     color: var(--gold-light);
     font-weight: 500;
+  }
+
+  td .concession-amt {
+    color: #d4a574;
+    font-weight: 500;
+  }
+
+  td .net-effective {
+    color: var(--gold-light);
+    font-weight: 500;
+    border-bottom: 1px dotted var(--gold-border);
+  }
+
+  td .muted {
+    color: var(--text-muted);
+  }
+
+  .footnote-mark {
+    color: var(--gold-light);
+    font-weight: 500;
+    margin-left: 2px;
+    cursor: help;
+  }
+
+  .table-footnote {
+    margin-top: 18px;
+    padding: 16px 20px;
+    border-left: 2px solid var(--gold-border);
+    background: rgba(201, 169, 97, 0.04);
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  .table-footnote .footnote-mark {
+    margin-right: 6px;
+    margin-left: 0;
+    font-style: normal;
   }
 
   /* ========== OFFER SECTION ========== */
@@ -930,6 +1002,11 @@
           <div class="spotlight-ppsf">$393 / sq ft</div>
           <div class="spotlight-orig">Original list <s>$485,000</s> &nbsp;·&nbsp; List $465,000</div>
           <div class="spotlight-ratio">95.88% of original list</div>
+          <div class="spotlight-concession">
+            <span class="conc-label">Seller Concessions</span>
+            <span class="conc-amt">−$8,920</span>
+            <span class="conc-net">Net to Seller: <strong>$456,080</strong></span>
+          </div>
           <div class="spotlight-divider"></div>
           <div class="spotlight-meta">
             <div class="spotlight-meta-item">
@@ -1086,7 +1163,7 @@
     <div class="section-eyebrow">All Closed Comparable Sales &nbsp;·&nbsp; Click Any Column to Sort</div>
 
     <div class="table-wrap">
-      <table id="compTable">
+      <table id="compTable" class="comp-table">
         <thead>
           <tr>
             <th class="photo-col"></th>
@@ -1098,6 +1175,8 @@
             <th data-key="orig" data-type="number">Orig List <span class="sort-indicator">↕</span></th>
             <th data-key="list" data-type="number">List Price <span class="sort-indicator">↕</span></th>
             <th data-key="sold" data-type="number">Sold Price <span class="sort-indicator">↕</span></th>
+            <th data-key="concessions" data-type="number">Concessions <span class="sort-indicator">↕</span></th>
+            <th data-key="net" data-type="number">Net to Seller <span class="sort-indicator">↕</span></th>
             <th data-key="ratio" data-type="number">Sale / Orig <span class="sort-indicator">↕</span></th>
             <th data-key="dom" data-type="number">DOM <span class="sort-indicator">↕</span></th>
             <th data-key="date" data-type="date">Sold Date <span class="sort-indicator">↕</span></th>
@@ -1105,6 +1184,10 @@
         </thead>
         <tbody id="compTbody"></tbody>
       </table>
+    </div>
+
+    <div class="table-footnote">
+      <span class="footnote-mark">†</span> 1940 Copper Ranch Lane, Unit E: seller notes indicate the seller paid the ~$8,232 special assessment balance at closing.
     </div>
   </div>
 </section>
@@ -1131,7 +1214,7 @@
         <div class="offer-delta">$25,000 under ask &nbsp;·&nbsp; 5.2% off</div>
         <div class="offer-ppsf">$428 / sq ft &nbsp;·&nbsp; $5 above top comp</div>
         <div class="offer-divider"></div>
-        <div class="offer-anchor">Matches the top closed unrenovated comp net of seller concessions (~$456K). Pays for the remodel via parity with the unrenovated ceiling.</div>
+        <div class="offer-anchor">Matches the top closed unrenovated comp (1930 Copper Ranch Lane, Unit C) net of $8,920 in seller concessions — effective net to seller was $456,080. Pays for the remodel via parity with the unrenovated ceiling.</div>
       </div>
 
       <div class="offer-card">
@@ -1164,12 +1247,12 @@
 <script>
   // ============ DATA ============
   const COMPS = [
-    { mls: '25-332755', address: '930 White Cloud Lane',   unit: 'Unit C', lat: 43.507507, lng: -114.290892, sqft: 1177, beds: 2, baths: 2, orig: 445000, list: 445000, sold: 440000, dom: 96,  date: '2025-05-12', year: 2004, photo: 'https://cdn.photos.sparkplatform.com/saw/20250202221729868623000000.jpg' },
-    { mls: '25-333345', address: '1930 Copper Ranch Lane', unit: 'Unit B', lat: 43.506861, lng: -114.289636, sqft: 1173, beds: 3, baths: 2, orig: 465000, list: 445000, sold: 445000, dom: 175, date: '2025-12-19', year: 2006, photo: 'https://cdn.photos.sparkplatform.com/saw/20250628004209435342000000.jpg' },
-    { mls: '25-333346', address: '1940 Copper Ranch Lane', unit: 'Unit E', lat: 43.506244, lng: -114.290065, sqft: 983,  beds: 2, baths: 1, orig: 400000, list: 390000, sold: 380000, dom: 203, date: '2026-01-16', year: 2005, photo: 'https://cdn.photos.sparkplatform.com/saw/20250627181447512339000000.jpg' },
-    { mls: '25-333464', address: '1930 Copper Ranch Lane', unit: 'Unit C', lat: 43.506859, lng: -114.289600, sqft: 1183, beds: 2, baths: 2, orig: 485000, list: 465000, sold: 465000, dom: 90,  date: '2025-10-14', year: 2006, photo: 'https://cdn.photos.sparkplatform.com/saw/20250716152153714980000000.jpg' },
-    { mls: '25-333481', address: '920 White Cloud Lane',   unit: 'Unit E', lat: 43.507238, lng: -114.291137, sqft: 966,  beds: 2, baths: 1, orig: 429000, list: 409000, sold: 392048, dom: 77,  date: '2025-10-03', year: 2004, photo: 'https://cdn.photos.sparkplatform.com/saw/20241205015342942243000000.jpg' },
-    { mls: '24-332683', address: '1830 Copper Ranch Lane', unit: 'Unit A', lat: 43.507873, lng: -114.290486, sqft: 1004, beds: 2, baths: 2, orig: 429900, list: 429900, sold: 425000, dom: 65,  date: '2025-03-07', year: 2005, photo: 'https://cdn.photos.sparkplatform.com/saw/20250101235926711426000000.jpg' },
+    { mls: '25-332755', address: '930 White Cloud Lane',   unit: 'Unit C', lat: 43.507507, lng: -114.290892, sqft: 1177, beds: 2, baths: 2, orig: 445000, list: 445000, sold: 440000, concessions: 0,    dom: 96,  date: '2025-05-12', year: 2004, photo: 'https://cdn.photos.sparkplatform.com/saw/20250202221729868623000000.jpg' },
+    { mls: '25-333345', address: '1930 Copper Ranch Lane', unit: 'Unit B', lat: 43.506861, lng: -114.289636, sqft: 1173, beds: 3, baths: 2, orig: 465000, list: 445000, sold: 445000, concessions: 9900, dom: 175, date: '2025-12-19', year: 2006, photo: 'https://cdn.photos.sparkplatform.com/saw/20250628004209435342000000.jpg' },
+    { mls: '25-333346', address: '1940 Copper Ranch Lane', unit: 'Unit E', lat: 43.506244, lng: -114.290065, sqft: 983,  beds: 2, baths: 1, orig: 400000, list: 390000, sold: 380000, concessions: 0,    concessionNote: true, dom: 203, date: '2026-01-16', year: 2005, photo: 'https://cdn.photos.sparkplatform.com/saw/20250627181447512339000000.jpg' },
+    { mls: '25-333464', address: '1930 Copper Ranch Lane', unit: 'Unit C', lat: 43.506859, lng: -114.289600, sqft: 1183, beds: 2, baths: 2, orig: 485000, list: 465000, sold: 465000, concessions: 8920, dom: 90,  date: '2025-10-14', year: 2006, photo: 'https://cdn.photos.sparkplatform.com/saw/20250716152153714980000000.jpg' },
+    { mls: '25-333481', address: '920 White Cloud Lane',   unit: 'Unit E', lat: 43.507238, lng: -114.291137, sqft: 966,  beds: 2, baths: 1, orig: 429000, list: 409000, sold: 392048, concessions: 0,    dom: 77,  date: '2025-10-03', year: 2004, photo: 'https://cdn.photos.sparkplatform.com/saw/20241205015342942243000000.jpg' },
+    { mls: '24-332683', address: '1830 Copper Ranch Lane', unit: 'Unit A', lat: 43.507873, lng: -114.290486, sqft: 1004, beds: 2, baths: 2, orig: 429900, list: 429900, sold: 425000, concessions: 0,    dom: 65,  date: '2025-03-07', year: 2005, photo: 'https://cdn.photos.sparkplatform.com/saw/20250101235926711426000000.jpg' },
   ];
 
   const SUBJECT = { lat: 43.507873, lng: -114.290486 }; // 1830 Copper Ranch Lane (subject building)
@@ -1183,6 +1266,14 @@
     tbody.innerHTML = '';
     data.forEach(c => {
       const ratio = c.sold / c.orig;
+      const net = c.sold - (c.concessions || 0);
+      const noteMark = c.concessionNote ? '<sup class="footnote-mark">†</sup>' : '';
+      const concCell = c.concessions
+        ? `<span class="concession-amt">−${fmtCurrency(c.concessions)}</span>`
+        : `<span class="muted">—${noteMark}</span>`;
+      const netCell = c.concessions
+        ? `<span class="net-effective">${fmtCurrency(net)}</span>`
+        : `<span class="muted">${fmtCurrency(net)}${noteMark}</span>`;
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td class="photo-cell"><img src="${c.photo}" alt="" loading="lazy" referrerpolicy="no-referrer"></td>
@@ -1194,6 +1285,8 @@
         <td>${fmtCurrency(c.orig)}</td>
         <td>${fmtCurrency(c.list)}</td>
         <td class="highlight">${fmtCurrency(c.sold)}</td>
+        <td>${concCell}</td>
+        <td>${netCell}</td>
         <td>${fmtPct(ratio)}</td>
         <td>${c.dom}</td>
         <td>${c.date}</td>
@@ -1212,8 +1305,9 @@
     sorted.sort((a, b) => {
       let av, bv;
       if (key === 'ratio') { av = a.sold / a.orig; bv = b.sold / b.orig; }
+      else if (key === 'net') { av = a.sold - (a.concessions || 0); bv = b.sold - (b.concessions || 0); }
       else if (key === 'date') { av = new Date(a.date).getTime(); bv = new Date(b.date).getTime(); }
-      else { av = a[key]; bv = b[key]; }
+      else { av = a[key] || 0; bv = b[key] || 0; }
 
       if (type === 'string') return sortState.dir * String(av).localeCompare(String(bv));
       return sortState.dir * (av - bv);
